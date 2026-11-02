@@ -1,0 +1,9 @@
+{
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "framework": null,
+    "installCommand": "STANDALONE_NEW_DOT=true npm ci",
+    "buildCommand": "NODE_OPTIONS=--max-old-space-size=7168 npm run build:preview && npm run preview:package",
+    "github": {
+        "silent": false
+    }
+}
