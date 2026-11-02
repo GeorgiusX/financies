@@ -20,7 +20,8 @@ const mime = {
     '.mp3': 'audio/mpeg',
 };
 const previewHeaders = {
-    'Content-Security-Policy': "connect-src 'self' blob: data:; img-src 'self' blob: data:; frame-src 'none'; form-action 'none'; base-uri 'self'",
+    'Content-Security-Policy':
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; connect-src 'self' blob: data:; img-src 'self' blob: data:; frame-src 'none'; form-action 'none'; base-uri 'self'",
     'Referrer-Policy': 'no-referrer',
     'X-Content-Type-Options': 'nosniff',
     'Cache-Control': 'no-store',
