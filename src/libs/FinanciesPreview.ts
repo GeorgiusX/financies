@@ -46,6 +46,38 @@ const previewExpenses = [
     ['Electricity', 'Utilities', 7250],
 ] as const;
 
+const PREVIEW_CHAT_CREATED_ACTION_ID = '900200';
+const PREVIEW_REPORT_CREATED_ACTION_ID = '900201';
+/** Actions need a timestamp that sorts before the expenses, which are dated 2026 or later. */
+const REPORT_CREATED_TIMESTAMP = '2026-01-01 00:00:00.000';
+
+function buildCreatedAction(reportActionID: string, accountID: number) {
+    // An action with an empty message counts as deleted and is hidden, so each one carries text.
+    return {reportActionID, actionName: CONST.REPORT.ACTIONS.TYPE.CREATED, actorAccountID: accountID, created: REPORT_CREATED_TIMESTAMP, message: [{type: 'TEXT', text: 'created'}]};
+}
+
+/** Expense action and thread IDs are derived from the transaction ID so rebuilding the data keeps them stable. */
+function getExpenseActionID(transactionID: string): string {
+    return `9${transactionID}`;
+}
+
+function getExpenseThreadID(transactionID: string): string {
+    return `8${transactionID}`;
+}
+
+function buildExpenseAction({transactionID, merchant, amount, currency, created, comment}: FinanciesExpense, accountID: number) {
+    return {
+        reportActionID: getExpenseActionID(transactionID),
+        // Report screens expect every expense to already have a thread; without one they create it instead of loading the report.
+        childReportID: getExpenseThreadID(transactionID),
+        actionName: CONST.REPORT.ACTIONS.TYPE.IOU,
+        actorAccountID: accountID,
+        created: created ? `${created} 00:00:00.000` : REPORT_CREATED_TIMESTAMP,
+        message: [{type: 'COMMENT', html: merchant, text: merchant}],
+        originalMessage: {IOUTransactionID: transactionID, IOUReportID: PREVIEW_REPORT_ID, type: CONST.IOU.REPORT_ACTION_TYPE.CREATE, amount, currency, comment},
+    };
+}
+
 function getPreviewExpenses(): FinanciesExpense[] {
     return previewExpenses.map(([merchant, category, amount], index) => ({
         transactionID: String(901000 + index),
@@ -150,9 +182,27 @@ function buildFinanciesData(account: FinanciesAccount, expenses: FinanciesExpens
             statusNum: CONST.REPORT.STATUS_NUM.OPEN,
             chatReportID: PREVIEW_CHAT_ID,
         },
-        [`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${PREVIEW_CHAT_ID}`]: {},
-        [`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${PREVIEW_REPORT_ID}`]: {},
+        // Report screens show a loading skeleton until a report has at least one action, so each report gets its CREATED action.
+        [`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${PREVIEW_CHAT_ID}`]: {[PREVIEW_CHAT_CREATED_ACTION_ID]: buildCreatedAction(PREVIEW_CHAT_CREATED_ACTION_ID, accountID)},
+        [`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${PREVIEW_REPORT_ID}`]: {
+            [PREVIEW_REPORT_CREATED_ACTION_ID]: buildCreatedAction(PREVIEW_REPORT_CREATED_ACTION_ID, accountID),
+            ...Object.fromEntries(expenses.map((expense) => [getExpenseActionID(expense.transactionID), buildExpenseAction(expense, accountID)])),
+        },
     };
+    for (const {transactionID} of expenses) {
+        const threadID = getExpenseThreadID(transactionID);
+        const threadCreatedActionID = `7${transactionID}`;
+        data[`${ONYXKEYS.COLLECTION.REPORT}${threadID}`] = {
+            reportID: threadID,
+            type: CONST.REPORT.TYPE.CHAT,
+            policyID: PREVIEW_POLICY_ID,
+            ownerAccountID: accountID,
+            parentReportID: PREVIEW_REPORT_ID,
+            parentReportActionID: getExpenseActionID(transactionID),
+            participants: {[accountID]: {notificationPreference: 'hidden'}},
+        };
+        data[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${threadID}`] = {[threadCreatedActionID]: buildCreatedAction(threadCreatedActionID, accountID)};
+    }
     for (const {transactionID, merchant, category, amount, currency, created, comment} of expenses) {
         data[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`] = {
             transactionID,
