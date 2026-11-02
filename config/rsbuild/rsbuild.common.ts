@@ -134,6 +134,26 @@ function mapEnvironmentToLogoSuffix(environmentFile: string): string {
  * `.storybook/rsbuild.config.ts`), so both bundle the same `__DEV__`/`__REACT_WEB_CONFIG__`/
  * `__GIT_BRANCH__` values for a given env file.
  */
+/** Financies backend settings stay out of the committed env file; they come from `.env.financies.local` or the host's environment (e.g. Vercel). */
+const FINANCIES_ENV_KEYS = [
+    'FINANCIES_BACKEND',
+    'FIREBASE_API_KEY',
+    'FIREBASE_AUTH_DOMAIN',
+    'FIREBASE_PROJECT_ID',
+    'FIREBASE_STORAGE_BUCKET',
+    'FIREBASE_MESSAGING_SENDER_ID',
+    'FIREBASE_APP_ID',
+];
+
+function getFinanciesOverrides(file: string): Record<string, string> {
+    if (file !== '.env.financies') {
+        return {};
+    }
+    // Values already in the environment win over the local file, so Vercel's settings are used there.
+    dotenv.config({path: '.env.financies.local'});
+    return Object.fromEntries(FINANCIES_ENV_KEYS.flatMap((key) => (process.env[key] === undefined ? [] : [[key, process.env[key]]])));
+}
+
 function getDefineValues(file: string): DefinePluginOptions {
     const isDevelopmentFile = file === '.env' || file === '.env.development';
     const parsedConfig = dotenv.config({path: file}).parsed;
@@ -152,6 +172,7 @@ function getDefineValues(file: string): DefinePluginOptions {
         __REACT_WEB_CONFIG__: JSON.stringify({
             ...parsedConfig,
             ...developmentOverrides,
+            ...getFinanciesOverrides(file),
         }),
 
         // React Native JavaScript environment requires the global __DEV__ variable to be accessible.
