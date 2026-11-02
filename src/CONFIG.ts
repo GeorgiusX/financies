@@ -72,6 +72,17 @@ const expensifyURLRoot = useNgrok && ngrokURL ? ngrokURL : expensifyComWithProxy
 export default {
     APP_NAME: 'NewExpensify',
     IS_FINANCIES_PREVIEW: get(Config, 'FINANCIES_PREVIEW', 'false') === 'true',
+    FINANCIES: {
+        IS_FIREBASE_BACKEND: get(Config, 'FINANCIES_PREVIEW', 'false') === 'true' && get(Config, 'FINANCIES_BACKEND', 'sample') === 'firebase',
+        FIREBASE: {
+            apiKey: get(Config, 'FIREBASE_API_KEY', ''),
+            authDomain: get(Config, 'FIREBASE_AUTH_DOMAIN', ''),
+            projectId: get(Config, 'FIREBASE_PROJECT_ID', ''),
+            storageBucket: get(Config, 'FIREBASE_STORAGE_BUCKET', ''),
+            messagingSenderId: get(Config, 'FIREBASE_MESSAGING_SENDER_ID', ''),
+            appId: get(Config, 'FIREBASE_APP_ID', ''),
+        },
+    },
     AUTH_TOKEN_EXPIRATION_TIME: 1000 * 60 * 90,
     ENVIRONMENT,
     EXPENSIFY: {

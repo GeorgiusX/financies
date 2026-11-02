@@ -17,6 +17,7 @@ import {alertUser} from './actions/UpdateRequired';
 import {READ_COMMANDS, SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from './API/types';
 import {getCommandURL} from './ApiUtils';
 import HttpsError from './Errors/HttpsError';
+import {getFinanciesBackendResponse} from './FinanciesBackend';
 import {getFinanciesPreviewResponse} from './FinanciesPreview';
 import {setLoadTestParameters} from './Network/LoadTestState';
 import preparePrefetchRequest from './Prefetch/preparePrefetchRequest';
@@ -188,7 +189,9 @@ function processHTTPRequest<TKey extends OnyxKey>(
             // The server's requestID only exists once the body is parsed, which is exactly when this phase ends. It ties every phase of one attempt together in Sentry.
             return parsedResponse.then(
                 (parsedBody) => {
-                    endSpanWithAttributes(downloadSpanId, {[CONST.TELEMETRY.ATTRIBUTE_REQUEST_ID]: parsedBody?.requestID});
+                    endSpanWithAttributes(downloadSpanId, {
+                        [CONST.TELEMETRY.ATTRIBUTE_REQUEST_ID]: parsedBody?.requestID,
+                    });
                     return parsedBody;
                 },
                 (error: unknown) => {
@@ -280,6 +283,9 @@ function xhr<TKey extends OnyxKey>(
     shouldUseSecure = false,
     initiatedOffline = false,
 ): Promise<Response<TKey>> {
+    if (CONFIG.FINANCIES.IS_FIREBASE_BACKEND) {
+        return getFinanciesBackendResponse(command, data);
+    }
     if (CONFIG.IS_FINANCIES_PREVIEW) {
         return Promise.resolve(getFinanciesPreviewResponse(command, data));
     }

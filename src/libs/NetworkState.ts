@@ -343,7 +343,8 @@ function configureAndSubscribe() {
     // QA: the Ping URL sits behind Cloudflare Access and NetInfo issues that request itself, so it cannot
     // carry the bearer and would read as a permanent outage. NetInfo's `reachabilityHeaders` is not a way
     // out. That config is static and the access token rotates on Cloudflare's schedule.
-    if (!CONFIG.IS_USING_LOCAL_WEB && !isQAServerActive()) {
+    // Financies: the Ping URL is Expensify's server, so reachability falls back to the OS signal instead.
+    if (!CONFIG.IS_USING_LOCAL_WEB && !isQAServerActive() && !CONFIG.IS_FINANCIES_PREVIEW) {
         NetInfo.configure({
             reachabilityUrl: configuredReachabilityUrl,
             reachabilityMethod: 'GET',
@@ -361,6 +362,9 @@ function configureAndSubscribe() {
             // This aligns behavior across web and mobile: poll every 60s when reachable, 5s when unreachable.
             useNativeReachability: false,
         });
+    } else if (CONFIG.IS_FINANCIES_PREVIEW) {
+        // NetInfo's default reachability URL is a Google endpoint, so turn the check off rather than fall back to it.
+        NetInfo.configure({reachabilityShouldRun: () => false});
     }
 
     unsubscribeNetInfo = NetInfo.addEventListener((state) => {
