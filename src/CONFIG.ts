@@ -34,7 +34,9 @@ const getDefaultLegacyPartnerConfig = () => {
 
 // Set default values to contributor friendly values to make development work out of the box without an .env file
 const ENVIRONMENT = get(Config, 'ENVIRONMENT', CONST.ENVIRONMENT.DEV);
-const newExpensifyURL = addTrailingForwardSlash(get(Config, 'NEW_EXPENSIFY_URL', 'https://new.expensify.com/'));
+const newExpensifyURL = addTrailingForwardSlash(
+    get(Config, 'FINANCIES_PREVIEW', 'false') === 'true' && typeof window !== 'undefined' ? window.location.origin : get(Config, 'NEW_EXPENSIFY_URL', 'https://new.expensify.com/'),
+);
 const expensifyURL = addTrailingForwardSlash(get(Config, 'EXPENSIFY_URL', 'https://www.expensify.com/'));
 const stagingExpensifyURL = addTrailingForwardSlash(get(Config, 'STAGING_EXPENSIFY_URL', 'https://staging.expensify.com/'));
 const stagingSecureExpensifyUrl = addTrailingForwardSlash(get(Config, 'STAGING_SECURE_EXPENSIFY_URL', 'https://staging-secure.expensify.com/'));
@@ -69,6 +71,7 @@ const expensifyURLRoot = useNgrok && ngrokURL ? ngrokURL : expensifyComWithProxy
 
 export default {
     APP_NAME: 'NewExpensify',
+    IS_FINANCIES_PREVIEW: get(Config, 'FINANCIES_PREVIEW', 'false') === 'true',
     AUTH_TOKEN_EXPIRATION_TIME: 1000 * 60 * 90,
     ENVIRONMENT,
     EXPENSIFY: {
@@ -108,7 +111,7 @@ export default {
         SUFFIX: ENVIRONMENT === CONST.ENVIRONMENT.DEV ? get(Config, 'PUSHER_DEV_SUFFIX', '') : '',
         CLUSTER: 'mt1',
     },
-    SITE_TITLE: ENVIRONMENT === CONST.ENVIRONMENT.DEV ? 'New Expensify [dev]' : 'New Expensify',
+    SITE_TITLE: get(Config, 'SITE_TITLE', ENVIRONMENT === CONST.ENVIRONMENT.DEV ? 'New Expensify [dev]' : 'New Expensify'),
     FAVICON: {
         DEFAULT: '/favicon.png',
         UNREAD: '/favicon-unread.png',

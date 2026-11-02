@@ -175,6 +175,7 @@ agent-device-output/
 
 # cspell cache
 .cspellcache
+.vercel/
 
 # Server CLI build artifacts (victory-chart-renderer, etc.)
 server/*/dist/

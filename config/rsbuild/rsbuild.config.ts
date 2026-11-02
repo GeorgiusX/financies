@@ -40,6 +40,9 @@ switch (process.env.ENV) {
     default:
         envFile = '.env';
 }
+if (process.env.FINANCIES_PREVIEW === 'true') {
+    envFile = '.env.financies';
+}
 
 export default defineConfig(async ({command}) => {
     const isDevServer = command === 'dev';

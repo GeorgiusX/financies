@@ -1,5 +1,6 @@
 import cleanupPreMountedDraftReports from '@libs/cleanupPreMountedDraftReports';
 import finishCloudflareSignInFromURL from '@libs/CloudflareAccess/finishSignInFromURL';
+import {getFinanciesPreviewData} from '@libs/FinanciesPreview';
 import intlPolyfill from '@libs/IntlPolyfill';
 import registerMiddlewares from '@libs/Middleware/register';
 import {startMainQueue} from '@libs/Network';
@@ -10,6 +11,7 @@ import {setDeviceID} from '@userActions/Device';
 import initOnyxDerivedValues from '@userActions/OnyxDerived';
 import {clearActiveTransactionIDs} from '@userActions/TransactionThreadNavigation';
 
+import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 
@@ -70,6 +72,7 @@ export default function () {
             [ONYXKEYS.IS_OPEN_APP_FAILURE_MODAL_OPEN]: false,
             // Without a default this server-owned NVP has no row until it arrives, and its loading status holds the Search router behind a skeleton
             [ONYXKEYS.RECENT_SEARCHES]: {},
+            ...(CONFIG.IS_FINANCIES_PREVIEW ? getFinanciesPreviewData() : {}),
         },
         skippableCollectionMemberIDs: CONST.SKIPPABLE_COLLECTION_MEMBER_IDS,
         snapshotMergeKeys: ['pendingAction', 'pendingFields'],

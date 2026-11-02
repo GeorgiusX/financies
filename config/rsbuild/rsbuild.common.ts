@@ -118,6 +118,7 @@ const environmentToLogoSuffixMap: Record<string, string> = {
     staging: '-stg',
     dev: '-dev',
     adhoc: '-adhoc',
+    financies: '-dark',
 };
 
 function mapEnvironmentToLogoSuffix(environmentFile: string): string {
@@ -353,10 +354,11 @@ const getSharedConfiguration = ({file = '.env', isDevServer = false}: Environmen
  */
 const getCommonConfiguration = async ({file = '.env', platform = 'web', isDevServer = false}: Environment): Promise<RsbuildConfig> => {
     const isDevelopment = file === '.env' || file === '.env.development';
-    const shouldCompressWithBrotli = !isDevelopment && file !== '.env.adhoc';
+    const shouldCompressWithBrotli = !isDevelopment && file !== '.env.adhoc' && file !== '.env.financies';
     const shared = getSharedConfiguration({file, platform, isDevServer});
     const sharedRspackTool = shared.tools?.rspack;
-    const sentryWebpackPlugin = isDevelopment ? undefined : (await import('@sentry/webpack-plugin')).sentryWebpackPlugin;
+    // The standalone preview does not publish telemetry or source maps to the upstream account.
+    const sentryWebpackPlugin = isDevelopment || file === '.env.financies' ? undefined : (await import('@sentry/webpack-plugin')).sentryWebpackPlugin;
     const {semanticVersion, buildNumber} = getAppVersion(process.env.npm_package_version ?? '');
     const releaseName = `${process.env.npm_package_name}@${semanticVersion}`;
 
@@ -446,6 +448,7 @@ const getCommonConfiguration = async ({file = '.env', platform = 'web', isDevSer
                 isProduction: file === '.env.production',
                 isStaging: file === '.env.staging',
                 useThirdPartyScripts: process.env.USE_THIRD_PARTY_SCRIPTS === 'true' || (platform === 'web' && ['.env.production', '.env.staging'].includes(file)),
+                isFinanciesPreview: file === '.env.financies',
             },
         },
         performance: {

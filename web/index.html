@@ -157,6 +157,9 @@
     <link rel="manifest" href="/manifest.json" />
 </head>
 <body>
+    <% if (isFinanciesPreview) { %>
+        <div style="position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:99999;padding:8px 16px;border-radius:20px;background:#122f26;color:white;font:12px system-ui;pointer-events:none;white-space:nowrap">Financies · Sample data preview · Firebase not connected</div>
+    <% } %>
     <% if (useThirdPartyScripts) { %>
         <!-- Google Tag Manager (noscript) -->
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N4M3FLJZ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>

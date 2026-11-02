@@ -1,5 +1,6 @@
 import alert from '@components/Alert';
 
+import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {RequestType} from '@src/types/onyx/Request';
@@ -16,6 +17,7 @@ import {alertUser} from './actions/UpdateRequired';
 import {READ_COMMANDS, SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from './API/types';
 import {getCommandURL} from './ApiUtils';
 import HttpsError from './Errors/HttpsError';
+import {getFinanciesPreviewResponse} from './FinanciesPreview';
 import {setLoadTestParameters} from './Network/LoadTestState';
 import preparePrefetchRequest from './Prefetch/preparePrefetchRequest';
 import registerPrefetchOnAppStart from './Prefetch/registerPrefetchOnAppStart';
@@ -278,6 +280,9 @@ function xhr<TKey extends OnyxKey>(
     shouldUseSecure = false,
     initiatedOffline = false,
 ): Promise<Response<TKey>> {
+    if (CONFIG.IS_FINANCIES_PREVIEW) {
+        return Promise.resolve(getFinanciesPreviewResponse(command, data));
+    }
     return prepareRequestPayload(command, data, initiatedOffline).then((formData) => {
         const url = getCommandURL({shouldUseSecure, command});
         const abortSignalController = data.canCancel ? (abortControllerMap.get(command as AbortCommand) ?? abortControllerMap.get(ABORT_COMMANDS.All)) : undefined;
