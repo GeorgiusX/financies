@@ -6,6 +6,8 @@ import type Response from '@src/types/onyx/Response';
 
 import type {OnyxKey} from 'react-native-onyx';
 
+import {format, getMonth, getQuarter, getYear, parse, startOfWeek} from 'date-fns';
+
 import {buildPersonalDetailsUpdate} from './PersonalDetailsUtils';
 
 const PREVIEW_ACCOUNT_ID = 900001;
@@ -227,6 +229,62 @@ function getFinanciesPreviewData(): Record<string, unknown> {
     return buildFinanciesData(PREVIEW_ACCOUNT, getPreviewExpenses(), 'financies-sample-only');
 }
 
+type SearchGroupFields = Record<string, string | number>;
+
+/** Returns the fields that identify an expense's group, or undefined when Financies cannot group by that field yet. */
+function getGroupFields(groupBy: string, expense: FinanciesExpense, accountID: number): SearchGroupFields | undefined {
+    const date = parse(expense.created, 'yyyy-MM-dd', new Date());
+    if (
+        Number.isNaN(date.getTime()) &&
+        [CONST.SEARCH.GROUP_BY.DAY, CONST.SEARCH.GROUP_BY.WEEK, CONST.SEARCH.GROUP_BY.MONTH, CONST.SEARCH.GROUP_BY.QUARTER, CONST.SEARCH.GROUP_BY.YEAR].some((by) => by === groupBy)
+    ) {
+        return undefined;
+    }
+    switch (groupBy) {
+        case CONST.SEARCH.GROUP_BY.CATEGORY:
+            return {category: expense.category};
+        case CONST.SEARCH.GROUP_BY.MERCHANT:
+            return {merchant: expense.merchant};
+        case CONST.SEARCH.GROUP_BY.TAG:
+            return {tag: ''};
+        case CONST.SEARCH.GROUP_BY.FROM:
+            return {accountID};
+        case CONST.SEARCH.GROUP_BY.DAY:
+            return {day: expense.created};
+        case CONST.SEARCH.GROUP_BY.WEEK:
+            return {week: format(startOfWeek(date, {weekStartsOn: CONST.WEEK_STARTS_ON}), 'yyyy-MM-dd')};
+        case CONST.SEARCH.GROUP_BY.MONTH:
+            return {year: getYear(date), month: getMonth(date) + 1};
+        case CONST.SEARCH.GROUP_BY.QUARTER:
+            return {year: getYear(date), quarter: getQuarter(date)};
+        case CONST.SEARCH.GROUP_BY.YEAR:
+            return {year: getYear(date)};
+        default:
+            return undefined;
+    }
+}
+
+/** Totals expenses per group the way the Search API does, so charts can plot them. Amounts are summed as-is across currencies for now. */
+function buildSearchGroups(groupBy: string, expenses: FinanciesExpense[], accountID: number, currency: string): Record<string, unknown> {
+    const groups: Record<string, SearchGroupFields & {count: number; total: number; currency: string}> = {};
+    for (const expense of expenses) {
+        const fields = getGroupFields(groupBy, expense, accountID);
+        if (!fields) {
+            continue;
+        }
+        const key = `${CONST.SEARCH.GROUP_PREFIX}${Object.values(fields).join('_')}`;
+        const group = groups[key] ?? {...fields, count: 0, total: 0, currency};
+        group.count += 1;
+        group.total += expense.amount;
+        groups[key] = group;
+    }
+    const total = getExpensesTotal(expenses);
+    for (const group of Object.values(groups)) {
+        group.percentOfTotal = total ? (group.total / total) * 100 : 0;
+    }
+    return groups;
+}
+
 /** Answers read commands from already-built Onyx state, or returns undefined when the command is not a read. */
 function buildFinanciesReadResponse<TKey extends OnyxKey>(
     command: string,
@@ -258,11 +316,15 @@ function buildFinanciesReadResponse<TKey extends OnyxKey>(
             };
         }
         const searchData = Object.fromEntries(Object.entries(fixture).filter(([key]) => /^(transactions_|report_|policy_|personalDetailsList)/.test(key)));
+        const session = fixture[ONYXKEYS.SESSION];
+        const accountID = session && typeof session === 'object' && 'accountID' in session && typeof session.accountID === 'number' ? session.accountID : CONST.DEFAULT_NUMBER_ID;
+        const currency = expenses.at(0)?.currency ?? CONST.CURRENCY.EUR;
+        const groupedData = typeof query.groupBy === 'string' ? buildSearchGroups(query.groupBy, expenses, accountID, currency) : {};
         onyxData.push({
             onyxMethod: 'set',
             key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${typeof parameters.hash === 'number' || typeof parameters.hash === 'string' ? parameters.hash : ''}`,
             value: {
-                data: searchData,
+                data: {...searchData, ...groupedData},
                 search: {
                     ...query,
                     hash: parameters.hash,
@@ -276,7 +338,7 @@ function buildFinanciesReadResponse<TKey extends OnyxKey>(
                     hasResults: true,
                     count: expenses.length,
                     total: getExpensesTotal(expenses),
-                    currency: 'EUR',
+                    currency,
                 },
             },
         });
@@ -300,5 +362,5 @@ function getFinanciesPreviewResponse<TKey extends OnyxKey>(command: string, para
     );
 }
 
-export {buildFinanciesData, buildFinanciesReadResponse, getFinanciesPreviewData, getFinanciesPreviewResponse};
+export {buildFinanciesData, buildFinanciesReadResponse, buildSearchGroups, getFinanciesPreviewData, getFinanciesPreviewResponse};
 export type {FinanciesAccount, FinanciesExpense};
