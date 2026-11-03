@@ -123,11 +123,15 @@ export default {
         CLUSTER: 'mt1',
     },
     SITE_TITLE: get(Config, 'SITE_TITLE', ENVIRONMENT === CONST.ENVIRONMENT.DEV ? 'New Expensify [dev]' : 'New Expensify'),
-    FAVICON: {
-        DEFAULT: '/favicon.png',
-        UNREAD: '/favicon-unread.png',
-        CONCIERGE_UNREAD: '/favicon-concierge-unread.png',
-    },
+    // Financies has one favicon until it has its own unread variants.
+    FAVICON:
+        get(Config, 'FINANCIES_PREVIEW', 'false') === 'true'
+            ? {DEFAULT: '/financies-logo.svg', UNREAD: '/financies-logo.svg', CONCIERGE_UNREAD: '/financies-logo.svg'}
+            : {
+                  DEFAULT: '/favicon.png',
+                  UNREAD: '/favicon-unread.png',
+                  CONCIERGE_UNREAD: '/favicon-concierge-unread.png',
+              },
     CAPTURE_METRICS: get(Config, 'CAPTURE_METRICS', 'false') === 'true',
     ONYX_METRICS: get(Config, 'ONYX_METRICS', 'false') === 'true',
     DEV_PORT: process.env.PORT ?? 8082,

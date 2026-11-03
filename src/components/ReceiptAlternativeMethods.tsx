@@ -7,6 +7,7 @@ import useScreenBoundDynamicRoute from '@hooks/useScreenBoundDynamicRoute';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 
+import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
 import {addLeadingForwardSlash} from '@src/libs/Url';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
@@ -37,7 +38,8 @@ function ReceiptAlternativeMethods({onLayout}: ReceiptAlternativeMethodsProps) {
     const downloadAppHref = `${environmentURL}${addLeadingForwardSlash(buildDynamicRoute(DYNAMIC_ROUTES.APP_DOWNLOAD_LINKS.path))}`;
     const contactMethodsHref = `${environmentURL}${addLeadingForwardSlash(buildDynamicRoute(DYNAMIC_ROUTES.CONTACT_METHODS.path))}`;
 
-    if (!isLastMobileAppLoginLoaded || !isPhoneNumberLoaded) {
+    // Financies has no mobile app, receipt inbox or SMS number yet, so the Expensify ones are not offered.
+    if (CONFIG.IS_FINANCIES_PREVIEW || !isLastMobileAppLoginLoaded || !isPhoneNumberLoaded) {
         return null;
     }
 

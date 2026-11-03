@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>New Expensify</title>
+    <title><%= siteTitle %></title>
     <meta name="description" content="Corporate cards, reimbursements, receipt scanning, invoicing, and bill pay.">
     <meta name="theme-color" content="#03D47C">
     <meta property="twitter:card" content="summary">
@@ -10,7 +10,7 @@
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="New Expensify">
     <meta property="og:url" content="https://new.expensify.com">
-    <meta property="og:title" content="New Expensify">
+    <meta property="og:title" content="<%= siteTitle %>">
     <meta property="og:description" content="Corporate cards, reimbursements, receipt scanning, invoicing, and bill pay.">
     <meta property="og:image" content="https://new.expensify.com/og-preview-image.png">
     <link rel="stylesheet" type="text/css" href="/css/pdf.css" />
@@ -143,7 +143,7 @@
     </style>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, interactive-widget=resizes-content, viewport-fit=cover">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="shortcut icon" id="favicon" href="/favicon.png">
+    <link rel="shortcut icon" id="favicon" href="<%= isFinanciesPreview ? '/financies-logo.svg' : '/favicon.png' %>">
     <% if (useThirdPartyScripts) { %>
         <!-- Google Tag Manager -->
         <script nonce='nonce-random-value'>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
