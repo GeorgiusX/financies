@@ -36,6 +36,10 @@ const EXTENSION_DENY_URLS = [/^chrome-extension:\/\//i, /^moz-extension:\/\//i, 
 const THIRD_PARTY_NOISE_INTEGRATIONS = [thirdPartyErrorFilterIntegration, classCallCheckNoiseFilterIntegration, googleTranslateRecursionNoiseFilterIntegration];
 
 function setupSentry(): void {
+    // Financies has no Sentry project yet, so its builds must not report to Expensify's.
+    if (CONFIG.IS_FINANCIES_PREVIEW) {
+        return;
+    }
     const {semanticVersion, buildNumber} = getAppVersion(pkg.version);
     const integrations = [
         navigationIntegration,

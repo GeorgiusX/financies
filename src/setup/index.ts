@@ -8,6 +8,7 @@ import ReceiptStorage from '@libs/ReceiptStorage';
 import registerReportActionsPagination from '@libs/registerReportActionsPagination';
 
 import {setDeviceID} from '@userActions/Device';
+import initFinanciesSession from '@userActions/FinanciesSession';
 import initOnyxDerivedValues from '@userActions/OnyxDerived';
 import {clearActiveTransactionIDs} from '@userActions/TransactionThreadNavigation';
 
@@ -72,7 +73,7 @@ export default function () {
             [ONYXKEYS.IS_OPEN_APP_FAILURE_MODAL_OPEN]: false,
             // Without a default this server-owned NVP has no row until it arrives, and its loading status holds the Search router behind a skeleton
             [ONYXKEYS.RECENT_SEARCHES]: {},
-            ...(CONFIG.IS_FINANCIES_PREVIEW ? getFinanciesPreviewData() : {}),
+            ...(CONFIG.IS_FINANCIES_PREVIEW && !CONFIG.FINANCIES.IS_FIREBASE_BACKEND ? getFinanciesPreviewData() : {}),
         },
         skippableCollectionMemberIDs: CONST.SKIPPABLE_COLLECTION_MEMBER_IDS,
         snapshotMergeKeys: ['pendingAction', 'pendingFields'],
@@ -118,6 +119,10 @@ export default function () {
             ONYXKEYS.RAM_ONLY_DYNAMIC_FORM_SENSITIVE_ANSWERS,
         ],
     });
+
+    if (CONFIG.FINANCIES.IS_FIREBASE_BACKEND) {
+        initFinanciesSession();
+    }
 
     cleanupPreMountedDraftReports();
 

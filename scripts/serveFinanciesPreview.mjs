@@ -21,7 +21,7 @@ const mime = {
 };
 const previewHeaders = {
     'Content-Security-Policy':
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; connect-src 'self' blob: data:; img-src 'self' blob: data:; frame-src 'none'; form-action 'none'; base-uri 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; connect-src 'self' blob: data: https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com; img-src 'self' blob: data:; frame-src 'none'; form-action 'none'; base-uri 'self'",
     'Referrer-Policy': 'no-referrer',
     'X-Content-Type-Options': 'nosniff',
     'Cache-Control': 'no-store',

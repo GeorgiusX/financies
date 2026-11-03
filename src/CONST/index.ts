@@ -11030,6 +11030,7 @@ const CONST = {
         SIGN_IN: {
             CONTINUE: 'SignIn-Continue',
             SIGN_IN_BUTTON: 'SignIn-SignInButton',
+            FINANCIES_SUBMIT: 'SignIn-FinanciesSubmit',
             JOIN: 'SignIn-Join',
             SSO: 'SignIn-SSO',
             VALIDATE_CODE: 'SignIn-ValidateCode',

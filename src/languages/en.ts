@@ -43,6 +43,16 @@ type States = Record<keyof typeof COMMON_CONST.STATES, StateValue>;
 type AllCountries = Record<Country, string>;
 
 const translations = {
+    financiesSignIn: {
+        title: 'Sign in to Financies',
+        email: 'Email',
+        password: 'Password',
+        signIn: 'Sign in',
+        createAccount: 'Create account',
+        switchToCreateAccount: 'New to Financies? Create an account',
+        switchToSignIn: 'Already have an account? Sign in',
+        invalidForm: 'Enter your email and a password of at least 6 characters.',
+    },
     bulkActionBar: {
         label: 'Bulk actions',
         clearSelection: 'Clear selection',
@@ -792,7 +802,10 @@ const translations = {
             troubleshootBiometricsStatus: ({status}: {status?: string}) => `Biometrics (${status})`,
             statusNeverRegistered: 'Never registered',
             statusNotRegistered: 'Not registered',
-            statusRegisteredOtherDevice: () => ({one: 'Another device registered', other: 'Other devices registered'}),
+            statusRegisteredOtherDevice: () => ({
+                one: 'Another device registered',
+                other: 'Other devices registered',
+            }),
             statusRegisteredThisDevice: 'Registered',
             yourAttemptWasUnsuccessful: 'Your authentication attempt was unsuccessful.',
             youCouldNotBeAuthenticated: 'You couldn’t be authenticated',
@@ -2614,9 +2627,18 @@ const translations = {
             testingPreferences: 'Testing preferences',
             server: 'Server',
             servers: {
-                production: {label: 'Production', description: 'The live environment real users see'},
-                staging: {label: 'Staging', description: 'Mirror of production. Used for final validation'},
-                qa: {label: 'QA', description: 'Experimental environment used for testing'},
+                production: {
+                    label: 'Production',
+                    description: 'The live environment real users see',
+                },
+                staging: {
+                    label: 'Staging',
+                    description: 'Mirror of production. Used for final validation',
+                },
+                qa: {
+                    label: 'QA',
+                    description: 'Experimental environment used for testing',
+                },
             },
             serverPinnedDescription: 'This build always talks to one server, so it cannot be changed here.',
             qaAuth: 'QA auth (Cloudflare)',
@@ -11995,7 +12017,11 @@ const translations = {
         markAsCashToIgnore: 'Mark as cash to ignore and request payment.',
         smartscanFailed: ({canEdit = true, missingFields = []}: {canEdit?: boolean; missingFields?: string[]}) => {
             if (missingFields.length > 0) {
-                const fieldNames: Record<string, string> = {merchant: 'merchant', date: 'date', amount: 'amount'};
+                const fieldNames: Record<string, string> = {
+                    merchant: 'merchant',
+                    date: 'date',
+                    amount: 'amount',
+                };
                 const translated = missingFields.map((f) => fieldNames[f] ?? f);
                 let fieldList = '';
                 if (translated.length === 1) {

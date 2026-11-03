@@ -158,6 +158,7 @@
     "expo-video": "57.0.2",
     "expo-web-browser": "57.0.2",
     "fast-equals": "^5.2.2",
+    "firebase": "12.4.0",
     "focus-trap-react": "^11.0.3",
     "group-ib-fp": "file:modules/group-ib-fp",
     "heic-to": "^1.1.14",

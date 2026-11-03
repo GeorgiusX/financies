@@ -187,3 +187,4 @@ bun.lock
 # Per-run Oxlint configs written by scripts/lint/oxlint/OxlintLinter.ts
 .oxlintrc.js-plugins.*.json
 .oxlintrc.type-aware.*.json
+/.env.financies.local

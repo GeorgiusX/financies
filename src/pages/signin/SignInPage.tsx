@@ -21,6 +21,7 @@ import Visibility from '@libs/Visibility';
 
 import {clearSignInData, isSupportalSession as isSupportalSessionUtils} from '@userActions/Session';
 
+import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -40,6 +41,7 @@ import type {BaseValidateCodeFormRef} from './ValidateCodeForm/BaseValidateCodeF
 
 import ChooseSSOOrValidateCode from './ChooseSSOOrValidateCode';
 import EmailDeliveryFailurePage from './EmailDeliveryFailurePage';
+import FinanciesSignInForm from './FinanciesSignInForm';
 import LoginForm from './LoginForm';
 import {LoginProvider} from './SignInLoginContext';
 import SignInPageLayout from './SignInPageLayout';
@@ -395,13 +397,27 @@ function SignInPageWrapper({ref, shouldResetTabTitle}: SignInPageProps) {
         <ScreenWrapper
             shouldShowOfflineIndicator={false}
             shouldEnableMaxHeight
-            style={[styles.signInPage, StyleUtils.getPlatformSafeAreaPadding({...safeAreaInsets, bottom: 0, top: isInNarrowPaneModal ? 0 : safeAreaInsets.top}, 1)]}
+            style={[
+                styles.signInPage,
+                StyleUtils.getPlatformSafeAreaPadding(
+                    {
+                        ...safeAreaInsets,
+                        bottom: 0,
+                        top: isInNarrowPaneModal ? 0 : safeAreaInsets.top,
+                    },
+                    1,
+                ),
+            ]}
             testID="SignInPageWrapper"
         >
-            <SignInPage
-                ref={ref}
-                shouldResetTabTitle={shouldResetTabTitle}
-            />
+            {CONFIG.FINANCIES.IS_FIREBASE_BACKEND ? (
+                <FinanciesSignInForm />
+            ) : (
+                <SignInPage
+                    ref={ref}
+                    shouldResetTabTitle={shouldResetTabTitle}
+                />
+            )}
         </ScreenWrapper>
     );
 }

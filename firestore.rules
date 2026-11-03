@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each user can only read and write their own data.
+    match /users/{userId}/{document=**} {
+      allow read, delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Expenses are stored in integer minor units with a three-letter currency code.
+    match /users/{userId}/transactions/{transactionId} {
+      allow create, update: if request.auth != null && request.auth.uid == userId
+        && request.resource.data.amount is int
+        && request.resource.data.amount >= 0
+        && request.resource.data.currency is string
+        && request.resource.data.currency.size() == 3
+        && request.resource.data.merchant is string
+        && request.resource.data.merchant.size() <= 255;
+    }
+  }
+}
