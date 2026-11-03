@@ -443,6 +443,7 @@ const getCommonConfiguration = async ({file = '.env', platform = 'web', isDevSer
                 {from: 'web/apple-touch-icon.png'},
                 {from: 'web/robots.txt'},
                 {from: 'assets/images/expensify-app-icon.svg'},
+                {from: 'assets/images/financies-logo.svg'},
                 {from: 'web/manifest.json'},
                 {from: 'assets/css/pdf.css', to: 'css/pdf.css'},
                 {from: 'assets/sounds', to: 'sounds'},
@@ -464,7 +465,11 @@ const getCommonConfiguration = async ({file = '.env', platform = 'web', isDevSer
         html: {
             template: 'web/index.html',
             templateParameters: {
-                splashLogo: fs.readFileSync(path.resolve(dirname, `../../assets/images/new-expensify${mapEnvironmentToLogoSuffix(file)}.svg`), 'utf-8'),
+                splashLogo: fs.readFileSync(
+                    path.resolve(dirname, file === '.env.financies' ? '../../assets/images/financies-logo.svg' : `../../assets/images/new-expensify${mapEnvironmentToLogoSuffix(file)}.svg`),
+                    'utf-8',
+                ),
+                siteTitle: file === '.env.financies' ? 'Financies' : 'New Expensify',
                 isWeb: platform === 'web',
                 isProduction: file === '.env.production',
                 isStaging: file === '.env.staging',
@@ -538,6 +543,12 @@ const getCommonConfiguration = async ({file = '.env', platform = 'web', isDevSer
                 };
 
                 afterShared.plugins ??= [];
+                if (file === '.env.financies') {
+                    // Financies builds swap the Expensify app icons for the Financies logo.
+                    afterShared.plugins.push(
+                        new rspack.NormalModuleReplacementPlugin(/expensify-(app-icon|logo-new)\.svg$/, path.resolve(dirname, '../../assets/images/financies-logo.svg')),
+                    );
+                }
                 afterShared.plugins.push(
                     // Only emit the SW for non-development builds. In dev, the dev-server's HMR
                     // and the SW's caching behavior fight each other and confuse hot reloads.

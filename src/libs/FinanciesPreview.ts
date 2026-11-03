@@ -140,7 +140,7 @@ function buildFinanciesData(account: FinanciesAccount, expenses: FinanciesExpens
         },
         [`${ONYXKEYS.COLLECTION.POLICY}${PREVIEW_POLICY_ID}`]: {
             id: PREVIEW_POLICY_ID,
-            name: 'Financies · Sample workspace',
+            name: 'Financies',
             type: CONST.POLICY.TYPE.TEAM,
             role: CONST.POLICY.ROLE.ADMIN,
             owner: email,
@@ -159,7 +159,7 @@ function buildFinanciesData(account: FinanciesAccount, expenses: FinanciesExpens
             reportID: PREVIEW_CHAT_ID,
             type: CONST.REPORT.TYPE.CHAT,
             chatType: CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT,
-            reportName: 'Financies · Sample workspace',
+            reportName: 'Financies',
             policyID: PREVIEW_POLICY_ID,
             ownerAccountID: accountID,
             participants: {[accountID]: {notificationPreference: 'always'}},
@@ -170,7 +170,7 @@ function buildFinanciesData(account: FinanciesAccount, expenses: FinanciesExpens
         },
         [`${ONYXKEYS.COLLECTION.REPORT}${PREVIEW_REPORT_ID}`]: {
             reportID: PREVIEW_REPORT_ID,
-            reportName: 'Everyday spending · Sample data',
+            reportName: 'Everyday spending',
             type: CONST.REPORT.TYPE.EXPENSE,
             policyID: PREVIEW_POLICY_ID,
             ownerAccountID: accountID,
