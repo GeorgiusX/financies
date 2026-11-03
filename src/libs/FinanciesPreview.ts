@@ -317,7 +317,7 @@ function buildFinanciesReadResponse<TKey extends OnyxKey>(
         }
         const searchData = Object.fromEntries(Object.entries(fixture).filter(([key]) => /^(transactions_|report_|policy_|personalDetailsList)/.test(key)));
         const session = fixture[ONYXKEYS.SESSION];
-        const accountID = session && typeof session === 'object' && 'accountID' in session && typeof session.accountID === 'number' ? session.accountID : 0;
+        const accountID = session && typeof session === 'object' && 'accountID' in session && typeof session.accountID === 'number' ? session.accountID : CONST.DEFAULT_NUMBER_ID;
         const currency = expenses.at(0)?.currency ?? CONST.CURRENCY.EUR;
         const groupedData = typeof query.groupBy === 'string' ? buildSearchGroups(query.groupBy, expenses, accountID, currency) : {};
         onyxData.push({
